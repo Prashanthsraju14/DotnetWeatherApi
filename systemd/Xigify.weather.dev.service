@@ -1,0 +1,17 @@
+[Unit]
+Description=Xigify Admin Service
+
+[Service]
+WorkingDirectory=/var/www/dev/weather
+ExecStart=/usr/bin/dotnet /var/www/dev/weather/WeatherApi.dll
+Restart=always
+#Restart service after 10 seconds when crash
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=webapi
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=ASPNETCORE_URLS=http://*:7083
+
+[Install]
+WantedBy=multi-user.target
