@@ -1,4 +1,5 @@
 #!/bin/bash
+dos2unix "$0"
 source /var/xigify/config
 cd /var/tempbuild/code/weather
 rm -rf deploy
