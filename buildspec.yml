@@ -1,5 +1,10 @@
 version: 0.2
 
+# Cache the global .NET tools folder to reuse SonarScanner between builds
+cache:
+  paths:
+    - '/root/.dotnet/tools'
+
 phases:
   install:
     runtime-versions:
@@ -10,8 +15,8 @@ phases:
       - export PATH="$HOME/.dotnet:$PATH"
       - dotnet --version  # Verify installed version
 
-      - echo "Installing SonarScanner for .NET..."
-      - dotnet tool install --global dotnet-sonarscanner
+      - echo "Installing SonarScanner if not already installed..."
+      - dotnet tool install --global dotnet-sonarscanner || echo "Already installed"
       - export PATH="$PATH:$HOME/.dotnet/tools"
 
   pre_build:
@@ -37,7 +42,7 @@ phases:
 artifacts:
   files:
     - appspec.yml
-    - deploy-scripts/**  # Includes deployment scripts
-    - systemd/**         # Includes systemd service files
-    - output/**          # Includes published .NET files
+    - deploy-scripts/**  # Deployment scripts
+    - systemd/**         # Systemd service files
+    - output/**          # Published .NET files
   discard-paths: no
