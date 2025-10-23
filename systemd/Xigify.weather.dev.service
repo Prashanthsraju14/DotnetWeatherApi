@@ -1,9 +1,9 @@
 [Unit]
-Description=Xigify Admin Service
+Description=Xigify WeatherApi Service
 
 [Service]
 WorkingDirectory=/var/www/dev/weather
-ExecStart=/usr/bin/dotnet /var/www/dev/weather/WeatherApi.dll
+ExecStart=/usr/bin/dotnet /home/ubuntu/dotnet/DotnetWeatherApi/publish/WeatherApi.dll --urls http://0.0.0.0:5000
 Restart=always
 #Restart service after 10 seconds when crash
 RestartSec=10
