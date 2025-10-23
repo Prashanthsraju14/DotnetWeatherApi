@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8.0 
+    commands:
+      - echo "Installing .NET SDK 8.0..."
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+      - export PATH="$HOME/.dotnet:$PATH"
+      - dotnet --version  # Verify the installed version
+
+  build:
+    commands:
+      - echo "Building the .NET application..."
+      - dotnet restore
+      - dotnet publish -c Release -o output
+
+  post_build:
+    commands:
+      - echo "Build completed successfully."
+
+artifacts:
+  files:
+    - appspec.yml
+    - deploy-scripts/**  # Includes all deployment scripts
+    - systemd/**         # Includes systemd service files
+    - output/**          # Includes all built .NET files (not zipped)
+  discard-paths: no
