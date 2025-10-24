@@ -3,9 +3,10 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo "Installing dependencies..."
+      - echo "Checking .NET version..."
       - dotnet --version
-      - dependency-check.sh --version
+      - echo "Checking Dependency-Check version..."
+      - dependency-check.sh --version || echo "Dependency-Check warning can be ignored"
 
   pre_build:
     commands:
@@ -25,7 +26,7 @@ phases:
     commands:
       - echo "Finishing SonarQube analysis..."
       - dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
-      - echo "Running OWASP Dependency-Check..."
+      - echo "Running OWASP Dependency-Check scan..."
       - mkdir -p dependency-check-report
       - dependency-check.sh --project "WeatherApp" --scan ./ --format "ALL" --out ./dependency-check-report
       - echo "Build, analysis, and dependency scan completed successfully."
@@ -36,5 +37,5 @@ artifacts:
     - deploy-scripts/**
     - systemd/**
     - output/**
-    - dependency-check-report/**   # <- include OWASP Dependency-Check report
+    - dependency-check-report/**   # Include OWASP Dependency-Check reports
   discard-paths: no
