@@ -2,28 +2,13 @@ version: 0.2
 
 env:
   variables:
-    DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+    SONAR_TOKEN: "$SONAR_TOKEN"
 
 phases:
-  install:
-    runtime-versions:
-      dotnet: 8.0
-    commands:
-      - echo "Installing SonarScanner locally..."
-      - mkdir -p .dotnet/tools
-      - dotnet tool install dotnet-sonarscanner --tool-path ./.dotnet/tools
-      - export PATH="$PATH:./.dotnet/tools"
-      - dotnet --version
-      - echo "SonarScanner ready"
-
   pre_build:
     commands:
       - echo "Starting SonarQube analysis..."
-      - ./.dotnet/tools/dotnet-sonarscanner begin /k:"Weather" \
-          /d:sonar.host.url="http://15.206.168.127:9000" \
-          /d:sonar.login="$SONAR_TOKEN" \
-          /d:sonar.projectBaseDir="./src" \
-          /d:sonar.exclusions="**/bin/**,**/obj/**"
+      - dotnet sonarscanner begin /k:"Weather" /d:sonar.host.url="http://52.66.210.51:9000" /d:sonar.login="$SONAR_TOKEN"
 
   build:
     commands:
@@ -37,7 +22,8 @@ phases:
   post_build:
     commands:
       - echo "Finishing SonarQube analysis..."
-      - ./.dotnet/tools/dotnet-sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      - dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      - echo "Build and analysis completed successfully."
 
 artifacts:
   files:
