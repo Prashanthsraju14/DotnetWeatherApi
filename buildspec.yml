@@ -1,6 +1,12 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - dotnet --version
+      - dependency-check.sh --version
+
   pre_build:
     commands:
       - echo "Starting SonarQube analysis..."
@@ -19,7 +25,10 @@ phases:
     commands:
       - echo "Finishing SonarQube analysis..."
       - dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
-      - echo "Build and analysis completed successfully."
+      - echo "Running OWASP Dependency-Check..."
+      - mkdir -p dependency-check-report
+      - dependency-check.sh --project "WeatherApp" --scan ./ --format "ALL" --out ./dependency-check-report
+      - echo "Build, analysis, and dependency scan completed successfully."
 
 artifacts:
   files:
@@ -27,4 +36,5 @@ artifacts:
     - deploy-scripts/**
     - systemd/**
     - output/**
+    - dependency-check-report/**   # <- include OWASP Dependency-Check report
   discard-paths: no
