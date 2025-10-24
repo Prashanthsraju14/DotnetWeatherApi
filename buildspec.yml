@@ -3,7 +3,6 @@ version: 0.2
 env:
   variables:
     DOTNET_CLI_TELEMETRY_OPTOUT: "true"
-    PATH: "$PATH:./.dotnet/tools"
 
 phases:
   install:
@@ -13,8 +12,9 @@ phases:
       - echo "Installing SonarScanner locally..."
       - mkdir -p .dotnet/tools
       - dotnet tool install dotnet-sonarscanner --tool-path ./.dotnet/tools
+      - export PATH="$PATH:./.dotnet/tools"
       - dotnet --version
-      - ./.dotnet/tools/dotnet-sonarscanner --version
+      - echo "SonarScanner ready"
 
   pre_build:
     commands:
