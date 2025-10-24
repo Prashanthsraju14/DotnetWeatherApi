@@ -8,7 +8,7 @@ phases:
   pre_build:
     commands:
       - echo "Starting SonarQube analysis..."
-      - dotnet sonarscanner begin /k:"Weather" /d:sonar.host.url="http://52.66.210.51:9000" /d:sonar.login="$SONAR_TOKEN"
+      - dotnet sonarscanner begin /k:"Weather" /d:sonar.host.url="http://15.206.168.127:9000" /d:sonar.login="$SONAR_TOKEN"
 
   build:
     commands:
