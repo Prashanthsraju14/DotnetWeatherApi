@@ -1,48 +1,74 @@
 version: 0.2
-
-# Cache the global .NET tools folder to reuse SonarScanner between builds
-cache:
-  paths:
-    - '/root/.dotnet/tools'
-
+ 
 phases:
+
   install:
+
     runtime-versions:
+
       dotnet: 8.0
+
     commands:
+
       - echo "Installing .NET SDK 8.0..."
+
       - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+
       - export PATH="$HOME/.dotnet:$PATH"
+
       - dotnet --version  # Verify installed version
+ 
+      - echo "Installing SonarScanner for .NET..."
 
-      - echo "Installing SonarScanner if not already installed..."
-      - dotnet tool install --global dotnet-sonarscanner || echo "Already installed"
+      - dotnet tool install --global dotnet-sonarscanner
+
       - export PATH="$PATH:$HOME/.dotnet/tools"
-
+ 
   pre_build:
+
     commands:
+
       - echo "Starting SonarQube analysis..."
+
       - dotnet sonarscanner begin /k:"Weather" /d:sonar.host.url="http://15.206.168.127:9000" /d:sonar.login="$SONAR_TOKEN"
-
+ 
   build:
+
     commands:
+
       - echo "Restoring dependencies..."
+
       - dotnet restore
+
       - echo "Building the solution..."
+
       - dotnet build -c Release
+
       - echo "Publishing the application..."
+
       - dotnet publish -c Release -o output
-
+ 
   post_build:
-    commands:
-      - echo "Finishing SonarQube analysis..."
-      - dotnet sonarscanner end /d:sonar.login="sqp_d87d23414fe127d673f5d93e02bac95e3594191f"
-      - echo "Build and analysis completed successfully."
 
+    commands:
+
+      - echo "Finishing SonarQube analysis..."
+
+      - dotnet sonarscanner end /d:sonar.login="sqp_d87d23414fe127d673f5d93e02bac95e3594191f"
+
+      - echo "Build and analysis completed successfully."
+ 
 artifacts:
+
   files:
+
     - appspec.yml
-    - deploy-scripts/**  # Deployment scripts
-    - systemd/**         # Systemd service files
-    - output/**          # Published .NET files
+
+    - deploy-scripts/**  # Includes deployment scripts
+
+    - systemd/**         # Includes systemd service files
+
+    - output/**          # Includes published .NET files
+
   discard-paths: no
+ 
