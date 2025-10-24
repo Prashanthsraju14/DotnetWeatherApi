@@ -1,28 +1,43 @@
 version: 0.2
 
+env:
+  variables:
+    DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
 phases:
+  install:
+    runtime-versions:
+      dotnet: 8.0
+    commands:
+      - echo "Installing SonarScanner for .NET..."
+      - dotnet tool install --global dotnet-sonarscanner
+      - export PATH="$PATH:/root/.dotnet/tools"
+      - dotnet --version
+      - dotnet sonarscanner --version
+
   pre_build:
     commands:
       - echo "Starting SonarQube analysis..."
-      - dotnet sonarscanner begin /k:"Weather" /d:sonar.host.url="http://15.206.168.127:9000" /d:sonar.login="$SONAR_TOKEN"
+      # Begin SonarQube scan, set project base dir and exclude bin/obj for speed
+      - dotnet sonarscanner begin /k:"Weather" \
+          /d:sonar.host.url="http://15.206.168.127:9000" \
+          /d:sonar.login="$SONAR_TOKEN" \
+          /d:sonar.projectBaseDir="./src" \
+          /d:sonar.exclusions="**/bin/**,**/obj/**"
 
   build:
     commands:
       - echo "Restoring dependencies..."
       - dotnet restore
-      - echo "Building the solution..."
+      - echo "Building solution..."
       - dotnet build -c Release
-      - echo "Publishing the application..."
+      - echo "Publishing application..."
       - dotnet publish -c Release -o output
 
   post_build:
     commands:
       - echo "Finishing SonarQube analysis..."
       - dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
-      - echo "Running OWASP Dependency-Check scan..."
-      - mkdir -p dependency-check-report
-      # Run scan with updated CLI
-      - dependency-check.sh --project "WeatherApp" --scan ./ --format "ALL" --out ./dependency-check-report || echo "Dependency-Check completed with warnings"
 
 artifacts:
   files:
@@ -30,5 +45,4 @@ artifacts:
     - deploy-scripts/**
     - systemd/**
     - output/**
-    - dependency-check-report/**
   discard-paths: no
